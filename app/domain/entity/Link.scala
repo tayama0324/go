@@ -1,6 +1,13 @@
 package domain.entity
 
-import org.joda.time.DateTime
+import play.api.data.validation.ValidationError
+import play.api.libs.json.Format
+import play.api.libs.json.JsString
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import scala.util.Success
+import scala.util.Try
 import spray.http.Uri
 
 /**
@@ -29,5 +36,28 @@ object LinkId {
 
 case class LinkAttr(
   destination: Uri,
-  owner: String,
+  owner: String
 )
+
+object Link {
+
+  private val urlReads = Reads.StringReads
+    .map(s => Try(Uri(s)))
+    .collect(ValidationError("Invalid url.")) { case Success(u) => u }
+
+  private val urlWrites = Writes[Uri](u => JsString(u.toString()))
+
+  private implicit val urlFormat = Format(urlReads, urlWrites)
+
+  implicit val linkIdReads = Reads.StringReads
+    .map(LinkId.of)
+    .collect(ValidationError("Invalid link id.")) { case Some(id) => id }
+
+  implicit val linkIdWrites = Writes[LinkId](id => JsString(id.value))
+
+  implicit val linkIdFormat = Format(linkIdReads, linkIdWrites)
+
+  implicit val linkAttrFormat = Json.format[LinkAttr]
+
+  implicit val linkFormat = Json.format[Link]
+}

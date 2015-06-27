@@ -1,3 +1,6 @@
+import sbt._
+import Keys._
+
 name := "go"
 
 version := "1.0-SNAPSHOT"
@@ -7,4 +10,5 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.1.2"
 )
 
-play.Project.playScalaSettings
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)

@@ -1,36 +1,69 @@
 package controllers
 
 import controllers.PostController.Request
-import domain.entity.{Link, LinkAttr, LinkId}
+import controllers.renderer.MixInFormRenderer
+import controllers.renderer.UsesFormRenderer
+import domain.entity.Link
+import domain.entity.LinkAttr
+import domain.entity.LinkId
+import domain.service.LinkPostService
 import domain.service.UsesLinkPostService
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc.{Result, AnyContent, Action, Controller}
+import play.api.data.Forms.mapping
+import play.api.data.Forms.text
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.Controller
+import play.api.mvc.Result
+import scalaz.-\/
+import scalaz.\/-
 
 /**
  */
-abstract class PostController extends Controller with UsesLinkPostService {
+abstract class PostController
+  extends Controller
+  with UsesLinkPostService
+  with UsesFormRenderer {
+
+  def get(): Action[AnyContent] = Action { _ =>
+    formRenderer.form()
+  }
 
   def post(): Action[AnyContent] = Action { implicit request =>
     PostController.form.bindFromRequest().fold(
-      { e => ??? }
+      { e => formRenderer.onError() },
       { r => postInternal(r) }
     )
   }
 
   private def postInternal(request: Request): Result = {
-    val id = LinkId.of(request.id)
-    val attr = LinkAttr(request.destination, request.owner)
-    val link = Link(id, attr)
-    linkPostService.insert(link) match {
-      case true => ??? // success
-      case false => ??? // failureぎ
+    val result = for {
+      id <- LinkId.of(request.id)
+      attr = LinkAttr(request.destination, request.owner)
+      link = Link(id, attr)
+      result = linkPostService.insert(link)
+    } yield result
+
+    result match {
+      case Some(\/-(_)) =>
+        formRenderer.onRegistered(request.id)
+
+      case Some(-\/(LinkPostService.Error.AlreadyRegistered)) =>
+        formRenderer.onError(Some("このリンクは既に登録済みです。"))
+
+      case Some(-\/(LinkPostService.Error.Reserved)) =>
+        formRenderer.onError(Some("このリンクは予約されています。"))
+
+      case None =>
+        formRenderer.onError()
     }
   }
 }
 
-
-object PostController {
+object PostController
+  extends PostController
+  with domain.service.MixInLinkPostService
+  with MixInFormRenderer {
 
   case class Request(
     id: String,
@@ -45,5 +78,4 @@ object PostController {
       "owner" -> text
     )(Request.apply)(Request.unapply)
   )
-
 }

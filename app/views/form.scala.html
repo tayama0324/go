@@ -1,0 +1,55 @@
+@(
+    defaultId: String,
+    successMessage: Option[String],
+    dangerMessage: Option[String]
+)
+@views.html.template {
+    @successMessage.map { msg =>
+    <div class="alert alert-success" role="alert">
+        @msg
+    </div>
+    }
+
+    @dangerMessage.map { msg =>
+    <div class="alert alert-danger" role="alert">
+        @msg
+    </div>
+    }
+
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Dwango Short Links</h1>
+        </div>
+
+        <h3>新規登録</h3>
+        @helper.form(routes.PostController.post(), 'class -> "form-inline") {
+            <div class="form-group">
+                <label>キーワード</label>
+                <input class="form-control" type="text" name="id" value="@defaultId" />
+            </div>
+            <div class="form-group">
+                <label>リンク先</label>
+                <input class="form-control" type="text" name="destination" value="" />
+            </div>
+            <div class="form-group">
+                <label>おなまえ </label>
+                <input class="form-control" type="text" name="owner" value="" />
+            </div>
+            <input type="submit" class="btn btn-default" />
+        }
+
+        <h3>削除</h3>
+        @helper.form(routes.DeleteController.delete(), 'class -> "form-inline") {
+            <div class="form-group">
+                <label>キーワード</label>
+                <input class="form-control" type="text" name="id" value="" />
+            </div>
+            <div class="form-group">
+                <label>おなまえ </label>
+                <input class="form-control" type="text" name="owner" placeholder="登録時に指定した名前" />
+            </div>
+            <input type="submit" class="btn btn-default" />
+        }
+    </div>
+}

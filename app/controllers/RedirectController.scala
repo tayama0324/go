@@ -13,8 +13,8 @@ import scalaz.{-\/, \/-}
  */
 abstract class RedirectController extends Controller with UsesRedirectService with UsesFormRenderer {
 
-  def redirect(path: String) = Action { implicit request =>
-    val path = Uri.Path(path)
+  def redirect(pathString: String) = Action { implicit request =>
+    val path = Uri.Path(pathString)
     redirectService.resolve(path) match {
       case \/-(uri) => Results.Redirect(uri.toString())
       case -\/(e: NoSuchElementException) =>
@@ -24,11 +24,13 @@ abstract class RedirectController extends Controller with UsesRedirectService wi
         }
         formRenderer.form(candidate)
       case -\/(NonFatal(e)) =>
+        e.printStackTrace()
         formRenderer.form("")
     }
   }
 }
 
 object RedirectController
-  extends MixInRedirectService
+  extends RedirectController
+  with MixInRedirectService
   with MixInFormRenderer

@@ -1,9 +1,12 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
 # Home page
-GET     /                           controllers.Application.index
+GET     /                                        controllers.PostController.get()
+POST    /                                        controllers.PostController.post()
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /go-link-management/links                controllers.ManagementController.dump()
+POST    /go-link-management/links                controllers.ManagementController.restore()
+POST    /go-link-management/links/delete         controllers.DeleteController.delete()
+POST    /go-link-management/links/force-delete   controllers.DeleteController.forceDelete()
+
+GET     /assets/*file                            controllers.Assets.at(path="/public", file)
+
+GET     /*path                                   controllers.RedirectController.redirect(path)
