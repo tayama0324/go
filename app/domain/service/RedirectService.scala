@@ -1,6 +1,8 @@
 package domain.service
 
 import domain.entity.{Link, LinkId}
+import domain.repository.MixInMongoLinkRepository
+import domain.repository.UsesMongoLinkRepository
 import domain.repository.{MixInLinkRepository, UsesLinkRepository}
 import spray.http.Uri
 import spray.http.Uri.Path.Segment
@@ -11,7 +13,7 @@ import scalaz.{-\/, \/-, \/}
  * Resolves redirect destination.
  */
 abstract class RedirectService
-  extends UsesLinkRepository {
+  extends UsesMongoLinkRepository {
 
   /**
    * Resolve redirect destination.
@@ -28,7 +30,7 @@ abstract class RedirectService
       case Segment(head, tail) =>
         val uriOpt = for {
           id <- LinkId.of(head)
-          link <- linkRepository.find(id)
+          link <- mongoLinkRepository.find(id)
         } yield buildUrl(link, tail)
 
         uriOpt match {
@@ -52,5 +54,5 @@ trait UsesRedirectService {
 }
 
 trait MixInRedirectService {
-  val redirectService = new RedirectService with MixInLinkRepository
+  val redirectService = new RedirectService with MixInMongoLinkRepository
 }

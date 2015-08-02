@@ -37,7 +37,7 @@ object LinkId {
 case class LinkAttr(
   destination: Uri,
   owner: String
-)
+) extends EntityAttr
 
 object Link {
 

@@ -42,10 +42,10 @@ abstract class DeleteController
         formRenderer.onDeleted(request.id)
 
       case Some(DeleteResult.NoSuchLink) =>
-        formRenderer.onError(Some("このリンクは登録されていません。"))
+        formRenderer.onError(Some("このキーワードは登録されていません。"))
 
       case Some(DeleteResult.OwnerMismatch) =>
-        formRenderer.onError(Some("リンクの所有者の名前が違います。"))
+        formRenderer.onError(Some("キーワードの所有者の名前が違います。"))
 
       case None =>
         formRenderer.onError()
@@ -70,7 +70,11 @@ abstract class DeleteController
         formRenderer.onDeleted(id)
 
       case Some(DeleteResult.NoSuchLink) =>
-        formRenderer.onError(Some("このリンクは登録されていません。"))
+        formRenderer.onError(Some("このキーワードは登録されていません。"))
+
+      case Some(DeleteResult.OwnerMismatch) =>
+        // Unreachable
+        formRenderer.onError(Some("キーワードの所有者の名前が違います。"))
 
       case None =>
         formRenderer.onError()

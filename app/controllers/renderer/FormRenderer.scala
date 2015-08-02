@@ -7,8 +7,12 @@ import play.api.mvc.{Results, Result}
  */
 class FormRenderer {
 
-  def form(defaultId: String = ""): Result = {
-    Results.Ok(views.html.form(defaultId, None, None))
+  def form(): Result = {
+    Results.Ok(views.html.form("", None, None))
+  }
+
+  def form(defaultId: String): Result = {
+    Results.Ok(views.html.form(defaultId, None, Some(defaultId + "はまだ登録されていません。")))
   }
 
   def onRegistered(id: String): Result = {

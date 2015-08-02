@@ -1,6 +1,8 @@
 package domain.service
 
 import domain.entity.Link
+import domain.repository.MixInMongoLinkRepository
+import domain.repository.UsesMongoLinkRepository
 import domain.repository.{MixInLinkRepository, UsesLinkRepository}
 import scalaz.-\/
 import scalaz.\/
@@ -9,7 +11,7 @@ import scalaz.\/-
 /**
  * Service that creates a new link.
  */
-abstract class LinkPostService extends UsesLinkRepository {
+abstract class LinkPostService extends UsesMongoLinkRepository {
 
   /**
    * Insert a link.
@@ -24,7 +26,7 @@ abstract class LinkPostService extends UsesLinkRepository {
     if (LinkPostService.blackListedPaths.contains(link.id.value)) {
       -\/(LinkPostService.Error.Reserved)
     } else {
-      if (linkRepository.insert(link)) {
+      if (mongoLinkRepository.insert(link)) {
         \/-()
       } else {
         -\/(LinkPostService.Error.AlreadyRegistered)
@@ -48,5 +50,5 @@ trait UsesLinkPostService {
 }
 
 trait MixInLinkPostService {
-  val linkPostService = new LinkPostService with MixInLinkRepository
+  val linkPostService = new LinkPostService with MixInMongoLinkRepository
 }

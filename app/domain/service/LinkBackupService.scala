@@ -1,19 +1,21 @@
 package domain.service
 
 import domain.entity.Link
+import domain.repository.MixInMongoLinkRepository
+import domain.repository.UsesMongoLinkRepository
 import domain.repository.{MixInLinkRepository, UsesLinkRepository}
 
 /**
  * Allows dump and restore link repository.
  */
-abstract class LinkBackupService extends UsesLinkRepository {
+abstract class LinkBackupService extends UsesMongoLinkRepository {
 
   /**
    * Extract all links in repository.
    *
    * @return Seq of links.
    */
-  def dump(): Seq[Link] = linkRepository.dump()
+  def dump(): Iterator[Link] = mongoLinkRepository.dump()
 
   /**
    * Insert given link into into repository.
@@ -22,7 +24,7 @@ abstract class LinkBackupService extends UsesLinkRepository {
    * the given link.
    * @param links Links to be inserted.
    */
-  def restore(links: Seq[Link]): Unit = links.foreach(linkRepository.upsert)
+  def restore(links: Seq[Link]): Unit = links.foreach(mongoLinkRepository.upsert)
 }
 
 trait UsesLinkBackupService {
@@ -30,5 +32,5 @@ trait UsesLinkBackupService {
 }
 
 trait MixInLinkBackupService {
-  val linkBackupService = new LinkBackupService with MixInLinkRepository
+  val linkBackupService = new LinkBackupService with MixInMongoLinkRepository
 }

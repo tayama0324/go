@@ -18,7 +18,7 @@ abstract class ManagementController
   with UsesLinkBackupService {
 
   def dump(): Action[AnyContent] = Action { _ =>
-    Results.Ok(Json.toJson(linkBackupService.dump()))
+    Results.Ok(Json.toJson(linkBackupService.dump().toSeq))
   }
 
   def restore(): Action[AnyContent] = Action { request =>

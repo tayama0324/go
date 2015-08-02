@@ -2,13 +2,15 @@ package domain.service
 
 import domain.entity.LinkId
 import domain.repository.MixInLinkRepository
+import domain.repository.MixInMongoLinkRepository
 import domain.repository.UsesLinkRepository
+import domain.repository.UsesMongoLinkRepository
 import domain.service.LinkDeleteService.DeleteResult
 
 /**
  * Deletes link.
  */
-abstract class LinkDeleteService extends UsesLinkRepository {
+abstract class LinkDeleteService extends UsesMongoLinkRepository {
 
   /**
    * Deletes a link.
@@ -21,9 +23,9 @@ abstract class LinkDeleteService extends UsesLinkRepository {
    * @return DeleteResult
    */
   def delete(linkId: LinkId, claimingOwner: String): DeleteResult = {
-    linkRepository.find(linkId) match {
+    mongoLinkRepository.find(linkId) match {
       case Some(link) if link.attr.owner == claimingOwner =>
-        linkRepository.delete(linkId)
+        mongoLinkRepository.delete(linkId)
         DeleteResult.Succeeded
       case Some(_) =>
         DeleteResult.OwnerMismatch
@@ -33,9 +35,9 @@ abstract class LinkDeleteService extends UsesLinkRepository {
   }
 
   def forceDelete(linkId: LinkId): DeleteResult = {
-    linkRepository.find(linkId) match {
+    mongoLinkRepository.find(linkId) match {
       case Some(link) =>
-        linkRepository.delete(linkId)
+        mongoLinkRepository.delete(linkId)
         DeleteResult.Succeeded
       case None =>
         DeleteResult.NoSuchLink
@@ -58,5 +60,5 @@ trait UsesLinkDeleteService {
 
 trait MixInLinkDeleteService {
   val linkDeleteService: LinkDeleteService =
-    new LinkDeleteService with MixInLinkRepository
+    new LinkDeleteService with MixInMongoLinkRepository
 }

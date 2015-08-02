@@ -49,10 +49,10 @@ abstract class PostController
         formRenderer.onRegistered(request.id)
 
       case Some(-\/(LinkPostService.Error.AlreadyRegistered)) =>
-        formRenderer.onError(Some("このリンクは既に登録済みです。"))
+        formRenderer.onError(Some("このキーワードは既に登録済みです。"))
 
       case Some(-\/(LinkPostService.Error.Reserved)) =>
-        formRenderer.onError(Some("このリンクは予約されています。"))
+        formRenderer.onError(Some("このキーワードは予約されています。"))
 
       case None =>
         formRenderer.onError()
