@@ -1,34 +1,31 @@
 package domain.infrastructure
 
-import com.mongodb.ServerAddress
-import com.mongodb.casbah.MongoClientOptions
+import com.mongodb.casbah.MongoClientURI
 import com.mongodb.casbah.MongoCollection
 
 /**
  * Manages a connection to mongo.
  */
-class MongoClient(host: String, port: Int) {
+class MongoClient(uriString: String) {
+
+  private val uri = MongoClientURI(uriString)
 
   private val client = {
-    val options = MongoClientOptions()
-    val serverAddress = new ServerAddress(host, port)
-    com.mongodb.casbah.MongoClient(serverAddress, options)
+    println("client URI: " + uri)
+    com.mongodb.casbah.MongoClient(uri)
   }
 
   /**
    * Returns mongo collection.
    *
-   * @param dbName Name of DB of the collection
-   * @param collectionName Name of the collection
+   * @param dbNameFallback Name of DB of the collection. If not specified,
+   * @param collectionNameFallback Name of the collection
    * @return MongoCollection collection
    */
-  def getCollection(dbName: String, collectionName: String): MongoCollection = {
-    try {
-      client(dbName)(collectionName)
-    } catch {
-      case e: Throwable => e.printStackTrace()
-        throw e
-    }
+  def getCollection(dbNameFallback: String, collectionNameFallback: String): MongoCollection = {
+    val dbName = uri.database.getOrElse(dbNameFallback)
+    val collectionName = uri.collection.getOrElse(collectionNameFallback)
+    client(dbName)(collectionName)
   }
 }
 
@@ -37,5 +34,5 @@ trait UsesMongoClient {
 }
 
 trait MixInMongoClient {
-  val mongoClient = new MongoClient("localhost", 27017)
+  val mongoClient = new MongoClient(System.getProperty("mongodb.uri"))
 }
