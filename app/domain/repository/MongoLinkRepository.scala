@@ -16,14 +16,5 @@ trait UsesMongoLinkRepository {
 }
 
 trait MixInMongoLinkRepository {
-  val mongoLinkRepository =
-    try {
-      new MongoLinkRepository with MixInMongoClient
-
-    } catch {
-      case e: Throwable =>
-        println("Error occurred.")
-        e.printStackTrace()
-        throw e
-    }
+  val mongoLinkRepository = new MongoLinkRepository with MixInMongoClient
 }

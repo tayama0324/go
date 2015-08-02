@@ -10,10 +10,8 @@ import com.mongodb.casbah.MongoCollection
 class MongoClient(host: String, port: Int) {
 
   private val client = {
-    println("initializing...")
     val options = MongoClientOptions()
     val serverAddress = new ServerAddress(host, port)
-    println("connecting " + host + " " + port)
     com.mongodb.casbah.MongoClient(serverAddress, options)
   }
 
