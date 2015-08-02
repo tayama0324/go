@@ -11,7 +11,6 @@ class MongoClient(uriString: String) {
   private val uri = MongoClientURI(uriString)
 
   private val client = {
-    println("client URI: " + uri)
     com.mongodb.casbah.MongoClient(uri)
   }
 
