@@ -1,6 +1,7 @@
 package domain.repository
 
 import com.mongodb.DBObject
+import com.mongodb.DuplicateKeyException
 import com.mongodb.casbah.Implicits
 import com.mongodb.casbah.commons.MongoDBObject
 import domain.entity.Entity
@@ -60,7 +61,12 @@ abstract class MongoRepository[
       "id" -> entity.id.value,
       "entity" -> toDbObject(entity)
     )
-    collection.insert(entry).getN == 1
+    try {
+      collection.insert(entry)
+      true
+    } catch {
+      case e: DuplicateKeyException => false
+    }
   }
 
   /**
@@ -92,6 +98,11 @@ abstract class MongoRepository[
       .map(toEntity)
   }
 
+  /**
+   * Removes an entity.
+   * @param id Id
+   * @return true if actually removed, false otherwise
+   */
   def delete(id: IdentityType): Boolean = {
     collection.remove(MongoDBObject("id" -> id.value)).getN == 1
   }
