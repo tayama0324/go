@@ -13,5 +13,12 @@ libraryDependencies ++= Seq(
   "org.scalaz"        %% "scalaz-core"       % "7.1.2"
 )
 
+val settings = Seq(
+  javaOptions ++= sys.process.javaVmArguments.filter(
+    a => Seq("-Xmx","-Xms","-XX").exists(a.startsWith)
+  )
+)
+
 lazy val root = (project in file("."))
+  .settings(settings)
   .enablePlugins(play.PlayScala)
